@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/eknkc/redis-lite",
   "dependencies": {
+    "async": "^0.9.0",
     "connection-parse": "0.0.7",
     "consistent": "^1.0.0",
     "hiredis": "^0.1.17"
