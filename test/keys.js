@@ -6,7 +6,7 @@ var assert = require('assert')
 describe('Keys', function () {
   var c = helpers.client();
 
-  it('DEL', function (done) {
+  it('should DEL existing key', function (done) {
 
     async.series({
       create: function (next) {
@@ -38,6 +38,17 @@ describe('Keys', function () {
       done();
     })
   });
+
+  it('should fail to DEL not existing key', function (done) {
+
+    c.del('aganiginaganigi', '', function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 when failed to DEL key');
+
+      done()
+    });
+  });
+
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
