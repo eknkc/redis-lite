@@ -49,6 +49,39 @@ describe('Keys', function () {
     });
   });
 
+  it('should return 1 if key EXISTS', function (done) {
+
+    async.series({
+      set: function (next) {
+        c.set('hede', 'hodo', 'EX', 100, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK');
+
+          next();
+        })
+      }, exists: function (next) {
+        c.exists('hede', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if exists');
+
+          next();
+        })
+      }
+    }, function (err, data) {
+      if (err) return done(err);
+      done();
+    })
+  });
+
+  it('should return 0 if key not EXITS', function (done) {
+    c.exists('hedehodo', function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if not exists')
+
+      done();
+    })
+  });
+
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
