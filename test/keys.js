@@ -1,6 +1,7 @@
 var assert = require('assert')
   , async = require('async')
-  , helpers = require('./helpers.js');
+  , helpers = require('./helpers.js')
+  , crypto = require('crypto');
 
 
 describe('Keys', function () {
@@ -82,10 +83,61 @@ describe('Keys', function () {
     })
   });
 
-  it('', function(done){
+  it('EXPIRE: should set ttl for key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
 
-  })
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should set key');
 
+          next();
+        })
+      },
+      setExpire: function (next) {
+        c.expire(key, 2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if timeout is set');
+
+          next();
+        })
+      },
+      checkTtl: function (next) {
+        c.ttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > -1, 'should be still alive');
+
+          next();
+        })
+      },
+      checkTtlAgain: function (next) {
+        setTimeout(function () {
+          c.ttl(key, function (err, data) {
+            assert.ok(!err);
+            assert.equal(data, -2, 'should return -2 if it is expired');
+
+            next();
+          })
+        }, 2000)
+      }
+    }, function (err) {
+      if (err) return done(err);
+      done();
+    })
+
+  });
+
+  it('EXPIRE: should fail to set ttl for not existing key', function (done) {
+
+    c.expire(crypto.randomBytes(5).toString('hex'), 10, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if key does not exists');
+
+      done();
+    })
+
+  });
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
