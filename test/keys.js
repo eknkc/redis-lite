@@ -35,7 +35,7 @@ describe('Keys', function () {
         });
       }
     }, function (err, data) {
-      if (err) return console.log(err);
+      if (err) console.log(err);
       done();
     })
   });
@@ -575,7 +575,7 @@ describe('Keys', function () {
       rename: function (next) {
         c.rename(key1, key2, function (err, data) {
           assert.ok(!err);
-          assert.equal(data, 'OK', 'should return OK if key is successfully renamed')
+          assert.equal(data, 'OK', 'should return OK if key is successfully renamed');
 
           done();
         })
@@ -602,15 +602,52 @@ describe('Keys', function () {
 
   it('RENAME: should fail to rename non existing key', function (done) {
 
-    c.rename(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+    c.rename('{deneme}' + crypto.randomBytes(8).toString('hex'), '{deneme}' + crypto.randomBytes(8).toString('hex'), function (err, data) {
       assert.ok(err, 'should return error if key is not exists');
 
       done();
     })
-  })
+  });
 
-  it('RENAMENX: should rename a key only if the new key does not exist', function (done) {
-    var key = crypto.randomBytes(8).toString('hex');
+  it('RENAME: should fail to rename keys from different server', function (done) {
+    var k = crypto.randomBytes(8).toString('hex')
+      , k2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set1: function (next) {
+        c.set(k, k, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      set2: function (next) {
+        c.set(k2, k2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      tryRename: function (next) {
+        c.rename(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(err, 'should return error if key is not exists');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    });
+
+
+  });
+
+  it('RENAMENX: should rename a key only if the new key does not exist and on the same hash slots', function (done) {
+    var key = '{hash}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{hash}' + crypto.randomBytes(8).toString('hex');
 
     async.series({
       set: function (next) {
@@ -622,23 +659,23 @@ describe('Keys', function () {
         })
       },
       renamenx: function (next) {
-        c.renamenx(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
-          console.log(err);
+        c.renamenx(key, key2, function (err, data) {
           assert.ok(!err);
           assert.equal(data, '1', 'should return 1 if key was renamed to newkey');
 
           next();
         })
       }
-    }, function () {
+    }, function (err) {
+      if (err) console.log(err);
       done();
     })
 
   })
 
   it('RENAMENX: should fail to rename a key to existing key', function (done) {
-    var key = crypto.randomBytes(8).toString('hex')
-      , key2 = crypto.randomBytes(8).toString('hex');
+    var key = '{deneme}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme}' + crypto.randomBytes(8).toString('hex');
 
     async.series({
       set: function (next) {
