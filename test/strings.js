@@ -23,7 +23,7 @@ describe('Strings', function () {
         });
       },
       append: function (next) {
-        c.append(key, appendVal, function (err) {
+        c.append(key, appendVal, function (err, data) {
           assert.ok(!err);
           assert.ok(data, 'should return some data if succeeded');
 
