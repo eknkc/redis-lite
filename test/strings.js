@@ -493,4 +493,76 @@ describe('Strings', function () {
     })
   })
 
+  it('PSETEX: should set ttl in milliseconds', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      psetex: function (next) {
+        c.psetex(key, 2000, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      checkttl: function (next) {
+        c.pttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > 0, 'should still alive');
+
+          next();
+        })
+      },
+      waitUnitlExpired: function (next) {
+        setTimeout(function () {
+          c.pttl(key, function (err, data) {
+            assert.ok(!err);
+            assert.equal(data, -2, 'key should expired');
+
+            next();
+          })
+        }, 2500)
+      }
+    }, function (err) {
+      if (err)console.log(err);
+      done();
+    })
+  })
+
+  it('SETEX: should set ttl in seconds', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      setex: function (next) {
+        c.setex(key, 2, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      checkttl: function (next) {
+        c.ttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > 0, 'should still alive');
+
+          next();
+        })
+      },
+      waitUnitlExpired: function (next) {
+        setTimeout(function () {
+          c.ttl(key, function (err, data) {
+            assert.ok(!err);
+            assert.equal(data, -2, 'key should expired');
+
+            next();
+          })
+        }, 2500)
+      }
+
+    }, function (err) {
+      if (err)console.log(err);
+      done();
+    })
+  })
 });
