@@ -577,14 +577,84 @@ describe('Keys', function () {
 
   })
 
-  it('RENAME: should fail to rename non existing key', function(done){
+  it('RENAME: should fail to rename non existing key', function (done) {
 
     c.rename(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
-      assert.ok(err,'should return error if key is not exists');
+      assert.ok(err, 'should return error if key is not exists');
 
       done();
     })
   })
+
+  it('RENAMENX: should rename a key only if the new key does not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next()
+        })
+      },
+      renamenx: function (next) {
+        c.renamenx(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '1', 'should return 1 if key was renamed to newkey');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+
+  it('RENAMENX: should fail to rename a key to existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , key2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      setNew: function (next) {
+        c.set(key2, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      renamenx: function (next) {
+        c.renamenx(key, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '0', 'should return 0 if newkey exists');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key2, function (err, data) {
+          assert.ok(!err);
+          assert.notEqual(data, key, 'should be different if keys wasnt changed');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  });
 
 
   //it('DUMP', function (done) {
