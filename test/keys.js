@@ -536,6 +536,57 @@ describe('Keys', function () {
     })
   })
 
+  it('RENAME: should rename key to new key', function (done) {
+    var key1 = crypto.randomBytes(8).toString('hex')
+      , key2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key1, key1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if key is successfuly created');
+
+          next();
+        })
+      },
+      rename: function (next) {
+        c.rename(key1, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if key is successfully renamed')
+
+          done();
+        })
+      },
+      checkKey1: function (next) {
+        c.get(key1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if key is not found');
+
+          done();
+        })
+      },
+      checkKey2: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key1, 'should have same value with key1');
+
+          done();
+        })
+      }
+    })
+
+  })
+
+  it('RENAME: should fail to rename non existing key', function(done){
+
+    c.rename(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+      assert.ok(err,'should return error if key is not exists');
+
+      done();
+    })
+  })
+
+
   //it('DUMP', function (done) {
   //  var val = 'hodo';
   //
@@ -575,4 +626,5 @@ describe('Keys', function () {
   //
   //})
 
-});
+})
+;
