@@ -337,6 +337,61 @@ describe('Keys', function () {
     })
   });
 
+  it('PEXPIRE: should set ttl for key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should set key');
+
+          next();
+        })
+      },
+      setExpire: function (next) {
+        c.pexpire(key, 1000, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if timeout is set');
+
+          next();
+        })
+      },
+      checkTtl: function (next) {
+        c.pttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > -1, 'should be still alive');
+
+          next();
+        })
+      },
+      checkTtlAgain: function (next) {
+        setTimeout(function () {
+          c.pttl(key, function (err, data) {
+            assert.ok(!err);
+            assert.equal(data, -2, 'should return -2 if it is expired');
+
+            next();
+          })
+        }, 2000)
+      }
+    }, function (err) {
+      if (err) return done(err);
+      done();
+    })
+
+  });
+
+  it('PEXPIRE: should fail to set ttl for not existing key', function (done) {
+
+    c.pexpire(crypto.randomBytes(5).toString('hex'), 10, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if key does not exists');
+
+      done();
+    })
+
+  });
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
