@@ -405,7 +405,7 @@ describe('Strings', function () {
         })
       },
       decr: function (next) {
-        c.decrby(key, 2, function (err, data) {
+        c.incrbyfloat(key, 2, function (err, data) {
           assert.ok(err, 'should return err if val is not integer');
 
           next();
@@ -425,5 +425,72 @@ describe('Strings', function () {
     })
   })
 
+  it('INCRBYFLOAT: should inc key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, 10.0, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.incrbyfloat(key, 2.2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12.2, 'should increased 10 by 2.2');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12.2, 'should be 12.2 if incrby succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('INCRBYFLOAT: should fail to incr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.incrbyfloat(key, 2.0, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
 
 });
