@@ -526,6 +526,16 @@ describe('Keys', function () {
     })
   });
 
+  it('RANDOMKEY: should return random key', function (done) {
+
+    c.randomkey(function (err, data) {
+      assert.ok(!err);
+      assert.ok(data, 'should return some key');
+
+      done();
+    })
+  })
+
   //it('DUMP', function (done) {
   //  var val = 'hodo';
   //
