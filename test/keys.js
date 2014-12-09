@@ -255,7 +255,7 @@ describe('Keys', function () {
         });
       },
       changeDb: function (next) {
-        c.select(1,  function (err, data) {
+        c.select(1, function (err, data) {
           assert.ok(!err);
           assert.equal(data, 'OK', 'should return OK if db changed');
 
@@ -277,7 +277,15 @@ describe('Keys', function () {
 
   });
 
+  it('MOVE: should fail to move key', function (done) {
+    c.move(crypto.randomBytes(8).toString('hex'), 5, function (err, data) {
+      console.log(err);
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if key is not moved successfully');
 
+      done();
+    });
+  });
 
 
   //it('DUMP', function (done) {
