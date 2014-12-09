@@ -18,8 +18,10 @@
     "url": "https://github.com/eknkc/redis-lite/issues"
   },
   "homepage": "https://github.com/eknkc/redis-lite",
+  "devDependencies": {
+    "async": "^0.9.0"
+  },
   "dependencies": {
-    "async": "^0.9.0",
     "connection-parse": "0.0.7",
     "consistent": "^1.0.2",
     "hiredis": "^0.1.17"
