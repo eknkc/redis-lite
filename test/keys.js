@@ -42,12 +42,27 @@ describe('Keys', function () {
 
   it('DEL: should fail to DEL not existing key', function (done) {
 
-    c.del('aganiginaganigi', '', function (err, data) {
-      assert.ok(!err);
-      assert.equal(data, 0, 'should return 0 when failed to DEL key');
+    async.series({
+      del: function (next) {
+        c.del('aganiginaganigi', '', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 when failed to DEL key');
 
-      done()
-    });
+          next()
+        })
+      },
+      checkIfExist: function (next) {
+        c.get('aganiginaganigi', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null bcz key is not exist');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
   });
 
   it('EXISTS: should return 1 if key EXISTS', function (done) {
