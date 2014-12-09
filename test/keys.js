@@ -99,12 +99,29 @@ describe('Keys', function () {
   });
 
   it('EXISTS: should return 0 if key not EXISTS', function (done) {
-    c.exists('hedehodo', function (err, data) {
-      assert.ok(!err);
-      assert.equal(data, 0, 'should return 0 if not exists')
 
+    async.series({
+      exists: function (next) {
+        c.exists('hedehodo', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if not exists')
+
+          next();
+        });
+      },
+      check: function (next) {
+        c.get('hedehodo', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if couldnt found');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
       done();
     })
+
   });
 
   it('EXPIRE: should set ttl for key', function (done) {
