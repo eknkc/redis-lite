@@ -393,6 +393,92 @@ describe('Keys', function () {
 
   });
 
+  it('PEXPIREAT: should set ttl unix timestamp for key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should set key');
+
+          next();
+        })
+      },
+      setExpireat: function (next) {
+        var expTimestamp = Math.round(new Date / 1) + 2000;
+
+        c.pexpireat(key, expTimestamp, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if timeout is set');
+
+          next();
+        })
+      },
+      checkTtl: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if it is still alive');
+
+          next();
+        })
+      },
+      checkTtlAgain: function (next) {
+        setTimeout(function () {
+          c.exists(key, function (err, data) {
+            assert.ok(!err);
+            assert.equal(data, 0, 'should return 0 if it is expired');
+
+            next();
+          })
+        }, 4000)
+      }
+    }, function (err) {
+      if (err) return done(err);
+      done();
+    })
+
+  });
+
+  it('PEXPIREAT: should fail to set ttl unix timestamp for not existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , expTimestamp = Math.round(new Date / 1000) + 2;
+
+    c.expireat(key, expTimestamp, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 key is not exists');
+
+      done();
+    })
+  });
+
+  it('PEXPIREAT: should fail to set ttl with invalid unix timestamp for key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should set key');
+
+          next();
+        })
+      },
+      setExpireat: function (next) {
+        var expTimestamp = key;
+
+        c.pexpireat(key, expTimestamp, function (err, data) {
+          assert.ok(err, 'should return error when timestamp is not valid');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) return done(err);
+      done();
+    })
+
+  });
   //it('DUMP', function (done) {
   //  var val = 'hodo';
   //
