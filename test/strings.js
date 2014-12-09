@@ -289,4 +289,141 @@ describe('Strings', function () {
     })
   })
 
+  it('INCR: should increase key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, 10, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.incr(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 11, 'should increase 10 by one');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 11, 'should be 11 if incr succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('INCR: should fail to incr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.incr(key, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('INCRBY: should inc key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, 10, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.incrby(key, 2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12, 'should increased 10 by two');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12, 'should be 12 if incrby succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('INCRBY: should fail to incr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      decr: function (next) {
+        c.decrby(key, 2, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+
 });
