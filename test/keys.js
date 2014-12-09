@@ -287,6 +287,48 @@ describe('Keys', function () {
     });
   });
 
+  it('PERSIST: should remove ttl of key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, 'EX', 10, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should succesfuly set key');
+
+          done();
+        });
+      },
+      checkTll: function (next) {
+        c.ttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > 0, 'should still alive');
+
+          done();
+        })
+      },
+      persist: function (next) {
+        c.persist(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if ttl is removed');
+
+          done();
+        })
+      },
+      checkTtlAgain: function (next) {
+        c.ttl(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > 0, 'should still alive');
+
+          done();
+        })
+      }
+    }, function (err, data) {
+      done(err);
+    })
+
+  });
+
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
