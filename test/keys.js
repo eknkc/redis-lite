@@ -279,7 +279,6 @@ describe('Keys', function () {
 
   it('MOVE: should fail to move key', function (done) {
     c.move(crypto.randomBytes(8).toString('hex'), 5, function (err, data) {
-      console.log(err);
       assert.ok(!err);
       assert.equal(data, 0, 'should return 0 if key is not moved successfully');
 
@@ -326,7 +325,16 @@ describe('Keys', function () {
     }, function (err, data) {
       done(err);
     })
+  });
 
+  it('PERSIST: should fail to remove non existing key', function (done) {
+
+    c.persist(crypto.randomBytes(8).toString('hex'), function (err, data) {
+      assert.ok(!err);
+      assert.equal(data,0, 'should return 0 if key not exists');
+
+      done();
+    })
   });
 
 
