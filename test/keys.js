@@ -75,10 +75,19 @@ describe('Keys', function () {
 
           next();
         })
-      }, exists: function (next) {
+      },
+      exists: function (next) {
         c.exists('hede', function (err, data) {
           assert.ok(!err);
           assert.equal(data, 1, 'should return 1 if exists');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get('hede', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'hodo', 'should return val of key');
 
           next();
         })
@@ -272,7 +281,6 @@ describe('Keys', function () {
       changeDb: function (next) {
         c.select(1, function (err, data) {
           assert.ok(!err);
-          assert.equal(data, 'OK', 'should return OK if db changed');
 
           next();
         });
@@ -552,8 +560,8 @@ describe('Keys', function () {
   })
 
   it('RENAME: should rename key to new key', function (done) {
-    var key1 = crypto.randomBytes(8).toString('hex')
-      , key2 = crypto.randomBytes(8).toString('hex');
+    var key1 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex');
 
     async.series({
       set: function (next) {
@@ -615,6 +623,7 @@ describe('Keys', function () {
       },
       renamenx: function (next) {
         c.renamenx(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          console.log(err);
           assert.ok(!err);
           assert.equal(data, '1', 'should return 1 if key was renamed to newkey');
 
@@ -715,44 +724,4 @@ describe('Keys', function () {
       done();
     })
   });
-
-  //it('DUMP', function (done) {
-  //  var val = 'hodo';
-  //
-  //  async.auto({
-  //    set: function (next) {
-  //      c.set('hede', val, 'EX', 1000, function (err, data) {
-  //        if (err) return next(err);
-  //        assert.ok(data);
-  //
-  //        next();
-  //      })
-  //    },
-  //    dump: ['set', function (next) {
-  //      c.dump('hede', function (err, data) {
-  //        if (err) return next(err);
-  //        assert.ok(data, 'should dump existing key');
-  //
-  //        console.log(data);
-  //
-  //        next();
-  //      })
-  //    }],
-  //    restore: ['dump', function (next, data) {
-  //      c.restore('hede', '0', 'asdsa', function (err, data) {
-  //        if (err) return next(err);
-  //        assert.equal(data, val, 'hash should be restored successfully');
-  //
-  //        next();
-  //      })
-  //    }]
-  //  }, function (err, data) {
-  //    console.log(data);
-  //    if (err) return done(err);
-  //
-  //    done();
-  //  })
-  //
-  //})
-
 })
