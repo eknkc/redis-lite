@@ -226,6 +226,59 @@ describe('Keys', function () {
 
   });
 
+  it('MOVE: should move key from (0) to another db (1)', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if key was successfully created');
+
+          next();
+        });
+      },
+      move: function (next) {
+        c.move(key, '1', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if key is moved successfully');
+
+          next();
+        });
+      },
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if key couldnt found in db 0');
+
+          next();
+        });
+      },
+      changeDb: function (next) {
+        c.select(1,  function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if db changed');
+
+          next();
+        });
+      },
+      getFromDb: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(key, data, 'should be found in new db');
+
+          next();
+        })
+      }
+    }, function (err, data) {
+      if (err) return done(err);
+      done();
+    })
+
+  });
+
+
+
 
   //it('DUMP', function (done) {
   //  var val = 'hodo';
