@@ -45,4 +45,38 @@ describe('Strings', function () {
 
   })
 
+  it('APPEND: should create non existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    async.series({
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null bcz key is not exist');
+
+          next();
+        })
+      },
+      append: function (next) {
+        c.append(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data, 'should return bits');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'key and value should be same if append was succeeded');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+
 });
