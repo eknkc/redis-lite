@@ -140,7 +140,7 @@ describe('Strings', function () {
         })
       }
     }, function (err) {
-      if(err) console.log(err);
+      if (err) console.log(err);
       done();
     })
   })
@@ -208,7 +208,49 @@ describe('Strings', function () {
         })
       }
     }, function (err) {
-      if(err) console.log(err);
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('GETRANGE: should get some ranges from key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      getRange1: function (next) {
+        c.getrange(key, 0, 3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key.slice(0, 4));
+
+          next();
+        })
+      },
+      getRange2: function (next) {
+        c.getrange(key, 2, 4, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key.slice(2, 5));
+
+          next();
+        })
+      },
+      getRange3: function (next) {
+        c.getrange(key, 3, 6, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key.slice(3, 7));
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
       done();
     })
   })
