@@ -42,7 +42,6 @@ describe('Strings', function () {
       if (err) console.log(err);
       done()
     });
-
   })
 
   it('APPEND: should create non existing key', function (done) {
@@ -74,6 +73,74 @@ describe('Strings', function () {
       }
     }, function (err) {
       if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('DECR: should decrese key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, 10, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      decr: function (next) {
+        c.decr(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 9, 'should decrease 10 by one');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 9, 'should be 9 if decr succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('DECR: should fail to decr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      decr: function (next) {
+        c.decr(key, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if(err) console.log(err);
       done();
     })
   })
