@@ -255,4 +255,38 @@ describe('Strings', function () {
     })
   })
 
+  it('GETSET: should set if not existed', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    async.series({
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should be null if key is not exist');
+
+          next();
+        })
+      },
+      getset: function (next) {
+        c.getset(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if key is not set previosly');
+
+          next();
+        })
+      },
+      getsetagain: function (next) {
+        c.getset(key, 'changed', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'key and val should be same if getset not worked');
+
+          next();
+        })
+      }
+
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
 });
