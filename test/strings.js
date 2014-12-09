@@ -565,4 +565,72 @@ describe('Strings', function () {
       done();
     })
   })
+
+  it('SETNX: should set a key if key does not exist ', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      get: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should be null bcz key is not set');
+
+          next();
+        })
+      },
+      setnx: function (next) {
+        c.setnx(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set key');
+
+          next();
+        })
+      },
+      getagain: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'key and val should be same if setnx worked');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done()
+    })
+  })
+
+  it('SETNX: should fail set a key if key bcz key exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.set(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should be OK if set');
+
+          next();
+        })
+      },
+      setnx: function (next) {
+        c.setnx(key, 'deneme', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if couldnt set key');
+
+          next();
+        })
+      },
+      getagain: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'key and val should be same if setnx didnt worked');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done()
+    })
+  })
 });
