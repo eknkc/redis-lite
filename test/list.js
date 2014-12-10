@@ -423,5 +423,66 @@ describe('Lists', function () {
     })
   })
 
+  it('LLEN: should return len of array', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if not exists');
+
+          next();
+        })
+      },
+      rpush: function (next) {
+        c.rpush(key, val1, val2, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return len of list');
+
+          next();
+        })
+      },
+      llen: function (next) {
+        c.llen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as len of list');
+
+          next()
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LEN: should return 0 as len of non existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if not exists');
+
+          next();
+        })
+      },
+      llen: function (next) {
+        c.llen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 as len of list');
+
+          next()
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
 });
 
