@@ -165,6 +165,41 @@ describe('Hashes', function () {
 
       done()
     })
+  });
+
+  it('HEXISTS: should return if field exists', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        });
+      },
+      exists: function (next) {
+        c.hexists(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should retunr 1 if the hash contans field');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  });
+
+  it('HEXISTS: should fail to return if field exits', function (done) {
+    c.hexists(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if couldnt find field in key');
+
+      done();
+    })
   })
 
 });
