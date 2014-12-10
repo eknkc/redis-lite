@@ -39,4 +39,40 @@ describe('Hashes', function () {
     })
   });
 
+  it('HGET: should get key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      hset: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      hget: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if set');
+
+          next();
+        });
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('HGET: should fail to get non existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    c.hget(key, key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, null, 'should return null if key not found');
+
+      done();
+    })
+
+  })
 });
