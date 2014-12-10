@@ -197,5 +197,71 @@ describe('Lists', function () {
 
   })
 
+  it('LINDEX: should return val by index', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, 'test1', 'test2', 'test3', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return number of inserted values');
+
+          next();
+        })
+      },
+      index0: function (next) {
+        c.lindex(key, 0, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'test1', 'should be test1');
+
+          next();
+        })
+      },
+      index2: function (next) {
+        c.lindex(key, 2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'test3', 'should be test3');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LINDEX: should retun null if checking non existing index', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, 'test1', 'test2', 'test3', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return number of inserted values');
+
+          next();
+        })
+      },
+      index0: function (next) {
+        c.lindex(key, 0, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'test1', 'should be test1');
+
+          next();
+        })
+      },
+      index2: function (next) {
+        c.lindex(key, 6, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should be null');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
 });
 
