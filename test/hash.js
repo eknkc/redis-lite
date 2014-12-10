@@ -531,5 +531,50 @@ describe('Hashes', function () {
     })
   })
 
+  it('HMSET: should set values to key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , field1 = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , field2 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if key is not exist');
+
+          next();
+        })
+      },
+      hmset: function (next) {
+        c.hmset(key, field1, val1, field2, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      hmget: function (next) {
+        c.hmget(key, field1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, val1, 'val should be same');
+
+          next();
+        })
+      },
+      hmget2: function (next) {
+        c.hmget(key, field2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, val2, 'val should be same');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
 
 });
