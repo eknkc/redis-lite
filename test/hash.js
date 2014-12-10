@@ -392,5 +392,73 @@ describe('Hashes', function () {
     })
   })
 
+  it('HLEN: should return number of fields in key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      hlen: function (next) {
+        c.hlen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as a len');
+
+          next();
+        })
+      },
+      setAgain: function (next) {
+        c.hset(key, crypto.randomBytes(8).toString('hex'), key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      hlenAgain: function (next) {
+        c.hlen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as a len');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+  it('HLEN: should return 0 as lenght of non existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if key is not exist');
+
+          next();
+        })
+      },
+      hlen: function (next) {
+        c.hlen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 as len if key is not exist');
+
+          next();
+        });
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
 
 });
