@@ -434,7 +434,7 @@ describe('Hashes', function () {
 
   })
 
-  it('HLEN: should return 0 as lenght of non existing key', function (done) {
+  it('HLEN: should return 0 as length of non existing key', function (done) {
     var key = crypto.randomBytes(8).toString('hex');
 
     async.series({
@@ -568,6 +568,94 @@ describe('Hashes', function () {
           assert.ok(!err);
           assert.equal(data[0], val1, 'val should be same');
           assert.equal(data[1], val2, 'val should be same');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('HSETNX: should set field if not exsits', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should be null if not exist');
+          next()
+        });
+      },
+      sethash: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '1', 'should return 1 if set');
+
+          next();
+        })
+      },
+      hexists: function (next) {
+        c.hexists(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, ' should return 1 if exists');
+
+          next();
+        })
+      },
+      hsetnx: function (next) {
+        c.hsetnx(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if field exists');
+
+          next();
+        })
+      },
+      hsetnxAgain: function (next) {
+        c.hsetnx(key, crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('HSETNX: should fail to set field if exsits', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.get(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should be null if not exist');
+          next()
+        });
+      },
+      sethash: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '1', 'should return 1 if set');
+
+          next();
+        })
+      },
+      hexists: function (next) {
+        c.hexists(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, ' should return 1 if exists');
+
+          next();
+        })
+      },
+      hsetnx: function (next) {
+        c.hsetnx(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if field exists');
 
           next();
         })
