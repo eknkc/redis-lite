@@ -460,5 +460,76 @@ describe('Hashes', function () {
 
   })
 
+  it('HVALS: should return all values in a key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      hvals: function (next) {
+        c.hvals(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 1, 'should return 1 as a len');
+
+          next();
+        })
+      },
+      setAgain: function (next) {
+        c.hset(key, crypto.randomBytes(8).toString('hex'), key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      hvalsAgain: function (next) {
+        c.hvals(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof  data, 'object', 'should return obj');
+          assert.equal(data.length, 2, 'should return 2 as a len');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+  it('HVALS: should return empty obj if key is not exists', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      exists: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if key is not exist');
+
+          next();
+        })
+      },
+      hkeys: function (next) {
+        c.hvals(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return empty obj');
+          assert.equal(data.length, 0, 'should return 0 if its empty');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
 
 });
