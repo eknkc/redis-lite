@@ -111,7 +111,6 @@ describe('Hashes', function () {
     })
   })
 
-
   it('HGETALL: should fail to get fields from non existing key ', function (done) {
     var key = crypto.randomBytes(8).toString('hex');
 
@@ -123,6 +122,49 @@ describe('Hashes', function () {
       done();
     })
 
+  })
+
+  it('HDEL: should delete hash fields', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next()
+        })
+      },
+      del: function (next) {
+        c.hdel(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if del successfuly');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, null, 'should return null if field not exist');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('HDEL: should fail to delete non existing field', function (done) {
+
+    c.hdel(crypto.randomBytes(8).toString('hex'), crypto.randomBytes(8).toString('hex'), function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if failed to del');
+
+      done()
+    })
   })
 
 });
