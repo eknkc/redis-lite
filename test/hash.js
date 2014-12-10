@@ -531,7 +531,7 @@ describe('Hashes', function () {
     })
   })
 
-  it('HMSET: should set values to key', function (done) {
+  it('HMSET, HMGET: should set values to key', function (done) {
     var key = crypto.randomBytes(8).toString('hex')
       , field1 = crypto.randomBytes(8).toString('hex')
       , val1 = crypto.randomBytes(8).toString('hex')
@@ -564,9 +564,10 @@ describe('Hashes', function () {
         })
       },
       hmget2: function (next) {
-        c.hmget(key, field2, function (err, data) {
+        c.hmget(key, field1, field2, function (err, data) {
           assert.ok(!err);
-          assert.equal(data, val2, 'val should be same');
+          assert.equal(data[0], val1, 'val should be same');
+          assert.equal(data[1], val2, 'val should be same');
 
           next();
         })
