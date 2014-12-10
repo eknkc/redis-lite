@@ -142,5 +142,60 @@ describe('Lists', function () {
 
   })
 
+  it('LPOP: should remove the first element in list', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.exists(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if not exists');
+
+          next();
+        })
+      },
+      lpush: function (next) {
+        c.rpush(key, val1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data > 0, 'should return len of list');
+
+          next();
+        })
+      },
+      lpop: function (next) {
+        c.lpop(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, val1, 'should return deleted');
+
+          next();
+        })
+      },
+      list: function (next) {
+        c.lrange(key, 0, 100, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data[0], val2, 'should be same with val2');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LPOP: should fail to remove val from non existing key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    c.lpop(key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, null, 'should return null if key non exist')
+
+      done();
+    })
+
+  })
+
 });
 
