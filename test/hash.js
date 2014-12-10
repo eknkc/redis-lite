@@ -256,4 +256,141 @@ describe('Hashes', function () {
     })
   })
 
+  it('HINCRBY: should inc key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, 10, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.hincrby(key, key, 2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12, 'should increased 10 by two');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12, 'should be 12 if incrby succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('HINCRBY: should fail to incr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      decr: function (next) {
+        c.hincrby(key, 2.2, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+  it('HINCRBYFLOAT: should inc key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, 10.0, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.hincrbyfloat(key, key, 2.2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12.2, 'should increased 10 by 2.2');
+
+          next();
+        })
+      },
+      get: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 12.2, 'should be 12.2 if incrby succeed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+
+  })
+
+  it('HINCRBYFLOAT: should fail to incr string key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if set');
+
+          next();
+        })
+      },
+      incr: function (next) {
+        c.hincrbyfloat(key, key, 2.0, function (err, data) {
+          assert.ok(err, 'should return err if val is not integer');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.hget(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, key, 'should be same if desc failed');
+
+          next();
+        })
+      }
+    }, function (err) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+
 });
