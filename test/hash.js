@@ -75,4 +75,54 @@ describe('Hashes', function () {
     })
 
   })
+
+  it('HGETALL: should get all fields of a key ', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.hset(key, crypto.randomBytes(8).toString('hex'), key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '1', 'should return 1 if set ');
+
+          next();
+        })
+      },
+      setAnother: function (next) {
+        c.hset(key, crypto.randomBytes(8).toString('hex'), key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, '1', 'should return 1 if set ');
+
+          next();
+        })
+      },
+      hgetall: function (next) {
+        c.hgetall(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.ok(data.length > 0, 'should return  some fields');
+
+          next();
+        })
+      }
+    }, function (err, data) {
+      if (err) console.log(err);
+      done();
+    })
+  })
+
+
+  it('HGETALL: should fail to get fields from non existing key ', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    c.hgetall(key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(typeof data, 'object', 'should return obj');
+      assert.equal(data.length, 0, 'should return 0');
+
+      done();
+    })
+
+  })
+
 });
