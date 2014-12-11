@@ -470,10 +470,47 @@ describe('Sets', function () {
 
     c.sismember(key, key, function (err, data) {
       assert.ok(!err);
-      assert.equal(data, 1, 'should return 0 if key is not exist');
+      assert.equal(data, 0, 'should return 0 if key is not exist');
 
       done();
     })
   });
+
+  it('SMEMBERS: should add some members in a set ', function (done) {
+    var key = crypto.randomBytes(4).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as length of insert');
+
+          next();
+        })
+      },
+      smembers: function (next) {
+        c.smembers(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof  data, 'object', 'should return obj');
+          assert.equal(data.length, 3, 'should return 3 as length of set');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('SMEMBERS: should return empty list if key is not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    c.smembers(key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(typeof data, 'object', 'should retun empty');
+      assert.equal(data.length, 0, 'should return 0 as set lenght');
+
+      done();
+    })
+  })
 
 });
