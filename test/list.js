@@ -484,5 +484,168 @@ describe('Lists', function () {
     })
   })
 
+  it('LINSERT:should insert value before 2nd element in key ', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, val1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as lenght');
+
+          next();
+        })
+      },
+      setAgain: function (next) {
+        c.rpush(key, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as lenght');
+
+          next();
+        })
+      },
+      linsert: function (next) {
+        c.linsert(key, 'BEFORE', val1, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as lenght of list');
+
+          next();
+        })
+      },
+      lrange: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj')
+          assert.equal(data[0], val3, 'should be same if insert worked');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LINSERT:should insert value after 1nd element in key ', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, val1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as lenght');
+
+          next();
+        })
+      },
+      setAgain: function (next) {
+        c.rpush(key, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as lenght');
+
+          next();
+        })
+      },
+      linsert: function (next) {
+        c.linsert(key, 'AFTER', val1, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as lenght of list');
+
+          next();
+        })
+      },
+      lrange: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj')
+          assert.equal(data[0], val1, 'should be same if insert worked');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LINSERT:should fail to insert value if pivot is not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, val1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as lenght');
+
+          next();
+        })
+      },
+      setAgain: function (next) {
+        c.rpush(key, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as lenght');
+
+          next();
+        })
+      },
+      linsert: function (next) {
+        c.linsert(key, 'HEDEHODO', val1, val3, function (err, data) {
+          assert.ok(err);
+
+          next();
+        })
+      },
+      lrange: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj')
+          assert.equal(data[0], val1, 'should be same if insert worked');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LINSERT:should return 0 if key is not found', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 0, 'should return 0 if key is empty');
+
+          next();
+        })
+      },
+      linsert: function (next) {
+        c.linsert(key, 'AFTER', val1, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return if key is not exist');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
 });
 
