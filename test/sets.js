@@ -465,4 +465,15 @@ describe('Sets', function () {
     })
   });
 
+  it('SISMEMBER: should return 0 if key is not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    c.sismember(key, key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 1, 'should return 0 if key is not exist');
+
+      done();
+    })
+  });
+
 });
