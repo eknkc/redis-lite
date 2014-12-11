@@ -421,4 +421,48 @@ describe('Sets', function () {
 
   })
 
+  it('SISMEMBER: should return if a given member is a member of the set stored at key', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , mem1 = crypto.randomBytes(8).toString('hex')
+      , mem2 = crypto.randomBytes(8).toString('hex')
+      , mem3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key, mem1, mem2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as length of insert');
+
+          next();
+        })
+      },
+      smembers1: function (next) {
+        c.sismember(key, mem1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if is a member of a set');
+
+          next();
+        })
+      },
+      smembers2: function (next) {
+        c.sismember(key, mem2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if is a member of a set');
+
+          next();
+        })
+      },
+      smembers3: function (next) {
+        c.sismember(key, mem3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should return 0 if is not a member of a set');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  });
+
 });
