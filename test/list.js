@@ -738,12 +738,56 @@ describe('Lists', function () {
         c.lrange(key, 0, -1, function (err, data) {
           assert.ok(!err);
           assert.equal(typeof data, 'object', 'should return list object');
-          assert.equal(data.length , 3, 'should return 3 as len of list');
+          assert.equal(data.length, 3, 'should return 3 as len of list');
 
           next();
         });
       }
     }, function () {
+      done();
+    })
+  })
+
+  it('LREM: should remove elemnt', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as len');
+
+          next();
+        })
+      },
+      set2: function (next) {
+        c.rpush(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len');
+
+          next();
+        })
+      },
+      lrem: function (next) {
+        c.lrem(key, 0, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if rem ');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('LREM: should fail to remove element from list', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    c.lrem(key, 0, key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 1 if failed to rem');
+
       done();
     })
   })
