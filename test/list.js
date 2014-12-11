@@ -647,5 +647,64 @@ describe('Lists', function () {
     })
   })
 
+  it('LSET: should set value of an element in list by its index', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      check: function (next) {
+        c.llen(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 0, 'should retun 0 if list is empty');
+
+          next();
+        })
+      },
+      rpush1: function (next) {
+        c.rpush(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as key lenght');
+
+          next();
+        })
+      },
+      rpush2: function (next) {
+        c.rpush(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 1 as key length');
+
+          next();
+        })
+      },
+      lset: function (next) {
+        c.lset(key, 0, 'changed', function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 'OK', 'should return OK if set');
+
+          next();
+        })
+      },
+      lrange: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data[0], 'changed', 'should return changed if lset worked');
+
+          next()
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+  it('LSET: should fail to set value in non existing key', function (done) {
+    c.lset(crypto.randomBytes(8).toString('hex'), 0, 0, function (err) {
+      assert.ok(err);
+
+      done();
+    })
+  })
+
 });
 
