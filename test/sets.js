@@ -33,4 +33,58 @@ describe('Sets', function () {
     })
   })
 
+  it('SCARD: should return lenght of sets', function (done) {
+    var key = crypto.randomBytes(4).toString('hex');
+
+    async.series({
+
+      sadd: function (next) {
+        c.sadd(key, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as length of sets');
+
+          next();
+        })
+      },
+      scard1: function (next) {
+        c.scard(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as length of set');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as length of sets');
+
+          next();
+        })
+      },
+      scard2: function (next) {
+        c.scard(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 4, 'should return 4 as length of set');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+  it('SCARD: should return 0 if key is not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    c.scard(key, function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 key is not exist');
+
+      done();
+    })
+  })
+
 });
