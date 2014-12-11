@@ -792,5 +792,97 @@ describe('Lists', function () {
     })
   })
 
+  it('RPOPLPUSH: should move last element from one list to another', function (done) {
+    var key1 = '{deneme}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      rpush: function (next) {
+        c.rpush(key1, val1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as len of list');
+
+          next();
+        })
+      },
+      rpush2: function (next) {
+        c.rpush(key1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len of list');
+
+          next();
+        })
+      },
+      rpoplpush: function (next) {
+        c.rpoplpush(key1, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, val2, ' should retun last element of key1');
+
+          next();
+        })
+      },
+      lrangekey1: function (next) {
+        c.lrange(key1, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 1, 'should return 1 as len of list');
+          assert.equal(data[0], val1, 'should be equal with val1');
+
+          next();
+        })
+      },
+      lrangekey2: function (next) {
+        c.lrange(key2, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 1, 'should return 1 as len of list');
+          assert.equal(data[0], val2, 'should be equal with val1');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('RPOPLPUSH: should fail to move last element from one list to another hash slot list', function (done) {
+    var key1 = '{' + crypto.randomBytes(4).toString('hex') + '}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{' + crypto.randomBytes(4).toString('hex') + '}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      rpush: function (next) {
+        c.rpush(key1, val1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 as len of list');
+
+          next();
+        })
+      },
+      rpush2: function (next) {
+        c.rpush(key1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len of list');
+
+          next();
+        })
+      },
+      rpoplpush: function (next) {
+        c.rpoplpush(key1, key2, function (err, data) {
+          assert.ok(err);
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+
 });
 
