@@ -706,5 +706,47 @@ describe('Lists', function () {
     })
   })
 
+  it('LRANGE: should return list', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      set: function (next) {
+        c.rpush(key, key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should retun 1 as length');
+
+          next();
+        })
+      },
+      set2: function (next) {
+        c.rpush(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should retun 2 as length');
+
+          next();
+        })
+      },
+      set3: function (next) {
+        c.rpush(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should retun 3 as length');
+
+          next();
+        })
+      },
+      lrange: function (next) {
+        c.lrange(key, 0, -1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return list object');
+          assert.equal(data.length , 3, 'should return 3 as len of list');
+
+          next();
+        });
+      }
+    }, function () {
+      done();
+    })
+  })
+
 });
 
