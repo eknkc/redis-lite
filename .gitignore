@@ -1,8 +1,3 @@
 node_modules/
-<<<<<<< HEAD
-dump.rdb
-.idea/
-=======
 .idea/
 dump.rdb
->>>>>>> 1ea300345e96040ebe086ce4ac31e1aae041a60b
