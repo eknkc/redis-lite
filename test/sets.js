@@ -253,4 +253,173 @@ describe('Sets', function () {
 
   })
 
+  it('SINTER: should return intersection between keys', function (done) {
+    var key1 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex')
+      , val4 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd1: function (next) {
+        c.sadd(key1, val1, val2, val3, val4, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 4, 'should return 4 as len of key');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, val1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len of key');
+
+          next();
+        })
+      },
+      sinter: function (next) {
+        c.sinter(key1, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', ' should retun obj');
+          assert.equal(data[0], val2, 'should return val1 as diff');
+          assert.equal(data[1], val1, 'should return val2 as diff');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  });
+
+  it('SINTER: should fail to return intersection between keys from different hash ranges', function (done) {
+    var key1 = '{aganiginaganigi}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex')
+      , val4 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd1: function (next) {
+        c.sadd(key1, val1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len of key');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, val1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 as len of key');
+
+          next();
+        })
+      },
+      sdiff: function (next) {
+        c.sinter(key1, key2, function (err, data) {
+          assert.ok(err);
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+  it('SINTERSTORE: should return intersection between keys and store to new key', function (done) {
+    var key1 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key3 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex')
+      , val4 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd1: function (next) {
+        c.sadd(key1, val1, val2, val3, val4, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 4, 'should return 4 as len of key');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, val1, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 3 as len of key');
+
+          next();
+        })
+      },
+      sinterstore: function (next) {
+        c.sinterstore(key3, key1, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 2, 'should return 2 if ok');
+
+          next();
+        })
+      },
+      smembers: function (next) {
+        c.smembers(key3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj of sets');
+          assert.equal(data[0], val1, 'set should be consisted only from val1');
+          assert.equal(data[1], val2, 'set should be consisted only from val2');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  });
+
+  it('SINTERSTORE: should fail to return intersection between keys from different hash ranges', function (done) {
+    var key1 = '{aganiginaganigi}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key3 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(8).toString('hex')
+      , val2 = crypto.randomBytes(8).toString('hex')
+      , val3 = crypto.randomBytes(8).toString('hex')
+      , val4 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd1: function (next) {
+        c.sadd(key1, val1, val2, val3, val4, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 4, 'should return 4 as len of key');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, val1, val2, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as len of key');
+
+          next();
+        })
+      },
+      sinterstore: function (next) {
+        c.sinterstore(key3, key1, key2, function (err, data) {
+          assert.ok(err);
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+
+  })
+
+
 });
