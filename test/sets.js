@@ -281,9 +281,9 @@ describe('Sets', function () {
       sinter: function (next) {
         c.sinter(key1, key2, function (err, data) {
           assert.ok(!err);
-          assert.equal(typeof data, 'object', ' should retun obj');
-          assert.equal(data[0], val2, 'should return val1 as diff');
-          assert.equal(data[1], val1, 'should return val2 as diff');
+          assert.equal(typeof data, 'object', ' should return obj');
+          assert.ok(data.indexOf(val1) > -1, 'should return val1 as diff');
+          assert.ok(data.indexOf(val2) > -1, 'should return val1 as diff');
 
           next();
         })
@@ -370,8 +370,8 @@ describe('Sets', function () {
         c.smembers(key3, function (err, data) {
           assert.ok(!err);
           assert.equal(typeof data, 'object', 'should return obj of sets');
-          assert.equal(data[0], val1, 'set should be consisted only from val1');
-          assert.equal(data[1], val2, 'set should be consisted only from val2');
+          assert.ok(data.indexOf(val1) > -1, 'should return val1 as diff');
+          assert.ok(data.indexOf(val2) > -1, 'should return val1 as diff');
 
           next();
         })
@@ -420,6 +420,5 @@ describe('Sets', function () {
     })
 
   })
-
 
 });
