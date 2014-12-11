@@ -513,4 +513,95 @@ describe('Sets', function () {
     })
   })
 
+  it('SMOVE: should move member from one set to another', function (done) {
+    var key1 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , m1 = crypto.randomBytes(8).toString('hex')
+      , m2 = crypto.randomBytes(8).toString('hex')
+      , m3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key1, m1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, m2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1');
+
+          next();
+        })
+      },
+      smove: function (next) {
+        c.smove(key1, key2, m1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if moved');
+
+          next();
+        });
+      },
+      smembers1: function (next) {
+        c.smembers(key1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 0, 'should be 0 if moved');
+
+          next();
+        })
+      },
+      smembers2: function (next) {
+        c.smembers(key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 2, 'should be 0 if moved');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('SMOVE: should fail to move member from one set to another from different hash set', function (done) {
+    var key1 = '{a}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{dbasdasd}' + crypto.randomBytes(8).toString('hex')
+      , m1 = crypto.randomBytes(8).toString('hex')
+      , m2 = crypto.randomBytes(8).toString('hex')
+      , m3 = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key1, m1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1');
+
+          next();
+        })
+      },
+      sadd2: function (next) {
+        c.sadd(key2, m2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1');
+
+          next();
+        })
+      },
+      smove: function (next) {
+        c.smove(key1, key2, m1, function (err, data) {
+          assert.ok(err);
+
+          next();
+        });
+      }
+    }, function () {
+      done();
+    })
+  })
+
 });
