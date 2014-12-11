@@ -602,6 +602,52 @@ describe('Sets', function () {
     }, function () {
       done();
     })
+  });
+
+  it('SPOP: should add some members in a set ', function (done) {
+    var key = crypto.randomBytes(4).toString('hex')
+      , removed;
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as length of insert');
+
+          next();
+        })
+      },
+      spop: function (next) {
+        c.spop(key, function (err, data) {
+          assert.ok(!err);
+          assert.ok(data, 'should return removed element');
+          removed = data;
+          next();
+        })
+      },
+      smembers: function (next) {
+        c.smembers(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return object');
+          assert.equal(data.indexOf(removed), -1, 'should return -1 if removed');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
   })
+
+  it('SPOP: should fail to remove element from non existing key', function (done) {
+
+    var key = crypto.randomBytes(8).toString('hex');
+    c.spop(key, key, function (err, data) {
+      assert.ok(err);
+
+      done();
+    })
+  })
+
 
 });
