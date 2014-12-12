@@ -3,8 +3,9 @@ var assert = require('assert')
   , helpers = require('./helpers.js')
   , crypto = require('crypto');
 
-
 describe('Keys', function () {
+  this.timeout(10000);
+
   var c = helpers.client();
 
   it('DEL: should DEL existing key', function (done) {

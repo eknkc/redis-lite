@@ -3,8 +3,9 @@ var assert = require('assert')
   , crypto = require('crypto')
   , helper = require('./helpers.js');
 
-
 describe('Sets', function () {
+  this.timeout(10000);
+
   var c = helper.client();
 
   it('SADD: should add some members in a set ', function (done) {
@@ -798,8 +799,8 @@ describe('Sets', function () {
   })
 
   it('SUNIOIN: should fail to union different hash range keys', function (done) {
-    var key1 = '{asdasda}' + crypto.randomBytes(8).toString('hex')
-      , key2 = '{xaxaxa}' + crypto.randomBytes(8).toString('hex');
+    var key1 = '{aaa}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{bbb}' + crypto.randomBytes(8).toString('hex');
 
     async.series({
       sadd: function (next) {
@@ -875,9 +876,9 @@ describe('Sets', function () {
   })
 
   it('SUNIOINSTORE: should fail to union different hash range keys', function (done) {
-    var destination = '{asdasda}' + crypto.randomBytes(8).toString('hex')
-      , key1 = '{asdasda}' + crypto.randomBytes(8).toString('hex')
-      , key2 = '{xaxaxa}' + crypto.randomBytes(8).toString('hex');
+    var destination = '{aaa}' + crypto.randomBytes(8).toString('hex')
+      , key1 = '{bbb}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{ccc}' + crypto.randomBytes(8).toString('hex');
 
     async.series({
       sadd: function (next) {

@@ -4,6 +4,8 @@ var assert = require('assert')
   , helper = require('./helpers.js');
 
 describe('Hashes', function () {
+  this.timeout(10000);
+
   var c = helper.client();
 
   it('HSET: should set', function (done) {

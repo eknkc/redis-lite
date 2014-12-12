@@ -4,6 +4,8 @@ var helpers = require("./helpers.js")
 global.testn = 0;
 
 describe('get / set', function () {
+  this.timeout(10000);
+
   var c = helpers.client();
 
   it('should set and get a value', function (next) {

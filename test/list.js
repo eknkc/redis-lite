@@ -4,6 +4,7 @@ var assert = require('assert')
   , helper = require('./helpers.js');
 
 describe('Lists', function () {
+  this.timeout(10000);
 
   var c = helper.client();
 
@@ -849,8 +850,8 @@ describe('Lists', function () {
   })
 
   it('RPOPLPUSH: should fail to move last element from one list to another hash slot list', function (done) {
-    var key1 = '{12312312312asdsa}' + crypto.randomBytes(8).toString('hex') + crypto.randomBytes(8).toString('hex')
-      , key2 = '{asdasdsad123123s}' + crypto.randomBytes(8).toString('hex')
+    var key1 = '{aaa}' + crypto.randomBytes(8).toString('hex') + crypto.randomBytes(8).toString('hex')
+      , key2 = '{bbb}' + crypto.randomBytes(8).toString('hex')
       , val1 = crypto.randomBytes(8).toString('hex')
       , val2 = crypto.randomBytes(8).toString('hex');
 

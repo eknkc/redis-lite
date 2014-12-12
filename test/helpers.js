@@ -1,5 +1,7 @@
+var SERVERS = ["localhost", "127.0.0.1"];
+
 var redis = require("../");
 
 module.exports.client = function () {
-  return redis(['localhost:6379', 'localhost:8888', 'localhost:9999'], { removeTimeout: 1000 });
+  return redis(SERVERS, { removeTimeout: 1000 });
 }

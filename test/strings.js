@@ -3,8 +3,9 @@ var assert = require('assert')
   , crypto = require('crypto')
   , helper = require('./helpers.js');
 
-
 describe('Strings', function () {
+  this.timeout(10000);
+
   var c = helper.client();
 
   it('APPEND: should append some text to key', function (done) {
