@@ -699,7 +699,8 @@ describe('Sets', function () {
     var key = crypto.randomBytes(8).toString('hex')
       , val1 = crypto.randomBytes(4).toString('hex')
       , val2 = crypto.randomBytes(4).toString('hex')
-      , val3 = crypto.randomBytes(4).toString('hex');
+      , val3 = crypto.randomBytes(4).toString('hex')
+      , val4 = crypto.randomBytes(4).toString('hex');
 
     async.series({
       add: function (next) {
@@ -711,7 +712,7 @@ describe('Sets', function () {
         })
       },
       srem: function (next) {
-        c.srem(key, val3, function (err, data) {
+        c.srem(key, val3, val4, function (err, data) {
           assert.ok(!err);
           assert.equal(data, 1, 'should return 1 if removed');
 
@@ -723,6 +724,7 @@ describe('Sets', function () {
           assert.ok(!err);
           assert.equal(typeof data, 'object', 'should return obj');
           assert.equal(data.indexOf(val3), -1, 'should return -1 if removed');
+          assert.equal(data.indexOf(val4), -1, 'should return -1 if removed');
 
           next()
         })
