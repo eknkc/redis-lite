@@ -21,11 +21,12 @@ var client = redis(servers, options);
 ```
 
 ### servers
-The server list can either be a string, array or object.
+The server list can either be a string, array, object or a function.
 
   - *string*: single server. use `hostname:port` or `hostname` for default port.
   - *array*: array of strings, keys will be distributed over these hosts.
   - *object*: different weights for different servers. `{"hostname1": 1, "hostname2": 2}` will cause hostname2 to have twica as many load as the hostname1.
+  - *function*: an async function that should call the supplied callback with a server list. list can be in any format described above. this should be used for discovery purposes. let's say you need to query aws api to gather all instances running redis, you can do it with this method. `redis(function(next) { next(null, "localhost"); })`
 
 ### options
 
