@@ -762,5 +762,73 @@ describe('Sets', function () {
     })
   })
 
+  it('SUNIOIN: should union same hash range keys', function (done) {
+    var key1 = '{deneme123}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{deneme123}' + crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key1, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as insert length');
+
+          next()
+        })
+      },
+      sadd1: function (next) {
+        c.sadd(key2, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as insert length');
+
+          next()
+        })
+      },
+      sunion: function (next) {
+        c.sunion(key1, key2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 6, 'should return members of both keys');
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('SUNIOIN: should fail to union different hash range keys', function (done) {
+    var key1 = '{asdasda}' + crypto.randomBytes(8).toString('hex')
+      , key2 = '{xaxaxa}' + crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key1, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as insert length');
+
+          next()
+        })
+      },
+      sadd1: function (next) {
+        c.sadd(key2, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as insert length');
+
+          next()
+        })
+      },
+      sunion: function (next) {
+        c.sunion(key1, key2, function (err, data) {
+          assert.ok(err);
+
+          next();
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
 
 });
