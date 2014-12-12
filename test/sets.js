@@ -693,6 +693,71 @@ describe('Sets', function () {
 
       done();
     })
+  });
+
+  it('SREM: should remove specified member from set', function (done) {
+    var key = crypto.randomBytes(8).toString('hex')
+      , val1 = crypto.randomBytes(4).toString('hex')
+      , val2 = crypto.randomBytes(4).toString('hex')
+      , val3 = crypto.randomBytes(4).toString('hex');
+
+    async.series({
+      add: function (next) {
+        c.sadd(key, val1, val2, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as length of insert');
+
+          next();
+        })
+      },
+      srem: function (next) {
+        c.srem(key, val3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if removed');
+
+          next();
+        })
+      },
+      check: function (next) {
+        c.smembers(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.indexOf(val3), -1, 'should return -1 if removed');
+
+          next()
+        })
+      },
+      srem2: function (next) {
+        c.srem(key, val2, function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 1, 'should return 1 if removed');
+
+          next();
+        })
+      },
+      check2: function (next) {
+        c.smembers(key, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.indexOf(val2), -1, 'should return -1 if removed');
+
+          next()
+        })
+      }
+    }, function () {
+      done();
+    })
+  })
+
+  it('SREM: should return 0 if key or member not exist', function (done) {
+    var key = crypto.randomBytes(4).toString('hex');
+
+    c.srem(key, crypto.randomBytes(8).toString('hex'), function (err, data) {
+      assert.ok(!err);
+      assert.equal(data, 0, 'should return 0 if key or member not exist');
+
+      done();
+    })
   })
 
 
