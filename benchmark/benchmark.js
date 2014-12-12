@@ -1,4 +1,4 @@
-var c = require("../index")(["localhost", "localhost:6479"], { connectionsPerServer: 1 });
+var c = require("../index")(["localhost", "127.0.0.1"], { connectionsPerServer: 1 });
 
 suite('basic', function() {
   before(function (next) {
