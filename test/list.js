@@ -849,8 +849,8 @@ describe('Lists', function () {
   })
 
   it('RPOPLPUSH: should fail to move last element from one list to another hash slot list', function (done) {
-    var key1 = '{x123}' + crypto.randomBytes(8).toString('hex') + crypto.randomBytes(8).toString('hex')
-      , key2 = '{denednend}' + crypto.randomBytes(8).toString('hex')
+    var key1 = '{12312312312asdsa}' + crypto.randomBytes(8).toString('hex') + crypto.randomBytes(8).toString('hex')
+      , key2 = '{asdasdsad123123s}' + crypto.randomBytes(8).toString('hex')
       , val1 = crypto.randomBytes(8).toString('hex')
       , val2 = crypto.randomBytes(8).toString('hex');
 
