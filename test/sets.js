@@ -649,5 +649,51 @@ describe('Sets', function () {
     })
   })
 
+  it('SRANDMEMBER: should get random key from set', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+
+    async.series({
+      sadd: function (next) {
+        c.sadd(key, crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), crypto.randomBytes(4).toString('hex'), function (err, data) {
+          assert.ok(!err);
+          assert.equal(data, 3, 'should return 3 as length of set');
+
+          next();
+        })
+      },
+      srandmember: function (next) {
+        c.srandmember(key, 1, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 1, 'should return 1 as length');
+
+          next();
+        })
+      },
+      srandmember2: function (next) {
+        c.srandmember(key, 3, function (err, data) {
+          assert.ok(!err);
+          assert.equal(typeof data, 'object', 'should return obj');
+          assert.equal(data.length, 3, 'should return 1 as length');
+
+          next();
+        })
+      },
+    }, function () {
+      done();
+    })
+  })
+
+  it('SRANDMEMBER: should return empty list if key is not exist', function (done) {
+    var key = crypto.randomBytes(8).toString('hex');
+    c.srandmember(key, 9, function (err, data) {
+      assert.ok(!err);
+      assert.equal(typeof data, 'object', 'should return empty obj');
+      assert.equal(data.length, '0', 'should return 0 length');
+
+      done();
+    })
+  })
+
 
 });
