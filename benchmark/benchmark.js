@@ -19,4 +19,10 @@ suite('basic', function() {
   bench('eval', function (next) {
     c.eval('redis.call("set", KEYS[1], "test"); return redis.call("get", KEYS[1])', 1, "{e}key", next);
   })
+
+  var s = c.createScript('redis.call("set", KEYS[1], "test"); return redis.call("get", KEYS[1])');
+
+  bench('evalscript', function (next) {
+    s.eval(["{e}key"], next);
+  })
 });

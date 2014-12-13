@@ -9,7 +9,6 @@ describe('Keys', function () {
   var c = helpers.client();
 
   it('DEL: should DEL existing key', function (done) {
-
     async.series({
       create: function (next) {
         c.set('denemeKey', "denemeVal", "EX", 100, function (err, data) {
