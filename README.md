@@ -1,6 +1,6 @@
 # redis-lite
 
-`redis-lite` is a lightweight and *fast* redis client for Node.JS with consistent hashing / sharding.
+`redis-lite` is a lightweight redis client for Node.JS with consistent hash clustering / sharding. Eventually, it'll support the redis cluster implementation.
 
  - Distributes keys over multiple redis servers using a consistent hashing algorithm.
  - Auto reconnect / failover mechanisms built in.
@@ -37,12 +37,29 @@ The server list can either be a string, array, object or a function.
   - `replacementHosts`: (default: `[]`) supply additional hostnames for failover. this setting requires a `removeTimeout` duration, however, client will replace dead servers with one from this list instead of simply removing them.
   - `connectionsPerServer`: (default: `1`) use n connections for each server. note that the client already does pipelining on a single connection, you do not need a lot of connections.
   - `enableOfflineQueue`: (default: `true`) if there is no active connection to a specific server, queue commands until we can acquire one.
-  - `keyPrefix`: (default: `''`) prefix all keys with a string, useful for namespacing keys.
-  - `hashLongKeys`: (default: `true`) redis keys can not be larger than 255 bytes lenght. set this true if you want the client to hash larger keys to fit into 255 character length limit.
 
 ```
-var client = redis("localhost:11211", { retryDelay: 5000, removeTimeout: 20000 });
+var client = redis("localhost:6379", { retryDelay: 5000, removeTimeout: 20000 });
 ```
+
+### commands
+Redis commands can be invoked directly on the client like this:
+
+```js
+client.get('key', function(err, data) {
+  ...
+});
+
+client.set('key', 'value', function(err) {
+  ...
+})
+
+client.set(['key', 'value'], function(err) {
+  ...
+})
+```
+
+`redis-lite` will find the appropriate server for a given command and execute it.
 
 ## author
 
