@@ -1,7 +1,7 @@
 {
   "name": "redis-lite",
   "version": "1.0.0",
-  "description": "Extremely lightweight redis client with consistent hashing & dead server removal & binary protocol implementation.",
+  "description": "Lightweight redis client with consistent hash clustering & dead server removal & full feature set.",
   "main": "index.js",
   "repository": {
     "type": "git",
